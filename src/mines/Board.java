@@ -43,21 +43,21 @@ public class Board extends JPanel {
     private JLabel statusBar;
 
     public Board(JLabel statusbar) {
+        random = new Random();
 
-        this.statusbar = statusbar;
-
-        img = new Image[NUM_IMAGES];
-
-        for (int i = 0; i < NUM_IMAGES; i++) {
-			img[i] =
-                    (new ImageIcon(getClass().getClassLoader().getResource((i)
-            			    + ".gif"))).getImage();
-        }
-
+        this.statusBar = statusbar;
+        loadImages();
         setDoubleBuffered(true);
-
         addMouseListener(new MinesAdapter());
         newGame();
+    }
+
+    private void loadImages() {
+        images = new Image[NUM_IMAGES];
+        for (int i = 0; i < NUM_IMAGES; i++) {
+            String imagePath = String.format("%d.gif", i);
+            images[i] = new ImageIcon(getClass().getClassLoader().getResource(imagePath)).getImage();
+        }
     }
 
 
