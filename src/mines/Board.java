@@ -168,68 +168,98 @@ public class Board extends JPanel {
     }
 
     class MinesAdapter extends MouseAdapter {
-        public void mousePressed(MouseEvent e) {
+        private int getClickedColumn(MouseEvent e) {
+            return e.getX() / CELL_SIZE;
+        }
 
-            int x = e.getX();
-            int y = e.getY();
+        private int getClickedRow(MouseEvent e) {
+            return e.getY() / CELL_SIZE;
+        }
 
-            int cCol = x / CELL_SIZE;
-            int cRow = y / CELL_SIZE;
+        private boolean isValidCell(int row, int col) {
+            return (row >= 0 && row < rows) && (col >= 0 && col < cols);
+        }
 
+        private boolean isRightClick(MouseEvent e) {
+            return e.getButton() == MouseEvent.BUTTON3;
+        }
+
+        private boolean isCovered(int cell) {
+            return cell > COVERED_MINE_CELL;
+        }
+
+        private boolean isMarked(int cell) {
+            return cell > MINE_CELL && cell < MARKED_MINE_CELL;
+        }
+
+        private boolean handleRightClick(int row, int col) {
             boolean rep = false;
+            if (field[(row * cols) + col] > MINE_CELL) {
+                rep = true;
+                if (field[(row * cols) + col] <= COVERED_MINE_CELL) {
+                    if (minesLeft > 0) {
+                        field[(row * cols) + col] += MARK_FOR_CELL;
+                        minesLeft--;
+                        statusBar.setText(Integer.toString(minesLeft));
+                    } else {
+                        statusBar.setText("No marks left");
+                    }
+                } else {
+                    field[(row * cols) + col] -= MARK_FOR_CELL;
+                    minesLeft++;
+                    statusBar.setText(Integer.toString(minesLeft));
+                }
+            }
+            return rep;
+        }
 
+        private boolean handleLeftClick(int row, int col) {
+            boolean rep = false;
+            if (isCovered(field[(row * cols) + col])) {
+                return rep;
+            }
+
+            if (isMarked(field[(row * cols) + col])) {
+                field[(row * cols) + col] -= COVER_FOR_CELL;
+
+                rep = true;
+
+                if (field[(row * cols) + col] == MINE_CELL) {
+                    inGame = false;
+                }
+
+                if (field[(row * cols) + col] == EMPTY_CELL) {
+                    findEmptyCells((row * cols) + col);
+                }
+            }
+            return rep;
+        }
+
+        private void handleClick(MouseEvent e) {
+            int col = getClickedColumn(e);
+            int row = getClickedRow(e);
 
             if (!inGame) {
                 newGame();
                 repaint();
             }
 
-
-            if ((x < cols * CELL_SIZE) && (y < rows * CELL_SIZE)) {
-
-                if (e.getButton() == MouseEvent.BUTTON3) {
-
-                    if (field[(cRow * cols) + cCol] > MINE_CELL) {
-                        rep = true;
-
-                        if (field[(cRow * cols) + cCol] <= COVERED_MINE_CELL) {
-                            if (mines_left > 0) {
-                                field[(cRow * cols) + cCol] += MARK_FOR_CELL;
-                                mines_left--;
-                                statusbar.setText(Integer.toString(mines_left));
-                            } else
-                                statusbar.setText("No marks left");
-                        } else {
-
-                            field[(cRow * cols) + cCol] -= MARK_FOR_CELL;
-                            mines_left++;
-                            statusbar.setText(Integer.toString(mines_left));
-                        }
-                    }
-
+            if (isValidCell(row, col)) {
+                boolean rep;
+                if (isRightClick(e)) {
+                    rep = handleRightClick(row, col);
                 } else {
-
-                    if (field[(cRow * cols) + cCol] > COVERED_MINE_CELL) {
-                        return;
-                    }
-
-                    if ((field[(cRow * cols) + cCol] > MINE_CELL) &&
-                        (field[(cRow * cols) + cCol] < MARKED_MINE_CELL)) {
-
-                        field[(cRow * cols) + cCol] -= COVER_FOR_CELL;
-                        rep = true;
-
-                        if (field[(cRow * cols) + cCol] == MINE_CELL)
-                            inGame = false;
-                        if (field[(cRow * cols) + cCol] == EMPTY_CELL)
-                            find_empty_cells((cRow * cols) + cCol);
-                    }
+                    rep = handleLeftClick(row, col);
                 }
 
                 if (rep)
                     repaint();
-
             }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            handleClick(e);
         }
     }
 }
