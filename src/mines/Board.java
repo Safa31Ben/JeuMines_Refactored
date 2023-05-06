@@ -12,33 +12,35 @@ import javax.swing.JPanel;
 
 
 public class Board extends JPanel {
-	private static final long serialVersionUID = 6195235521361212179L;
-	
-	private final int NUM_IMAGES = 13;
-    private final int CELL_SIZE = 15;
+    private static final long serialVersionUID = 6195235521361212179L;
 
-    private final int COVER_FOR_CELL = 10;
-    private final int MARK_FOR_CELL = 10;
-    private final int EMPTY_CELL = 0;
-    private final int MINE_CELL = 9;
-    private final int COVERED_MINE_CELL = MINE_CELL + COVER_FOR_CELL;
-    private final int MARKED_MINE_CELL = COVERED_MINE_CELL + MARK_FOR_CELL;
+    private Random random;
 
-    private final int DRAW_MINE = 9;
-    private final int DRAW_COVER = 10;
-    private final int DRAW_MARK = 11;
-    private final int DRAW_WRONG_MARK = 12;
+    private static final int NUM_IMAGES = 13;
+    private static final int CELL_SIZE = 15;
+
+    private static final int COVER_FOR_CELL = 10;
+    private static final int MARK_FOR_CELL = 10;
+
+    private static final int EMPTY_CELL = 0;
+    private static final int MINE_CELL = 9;
+    private static final int COVERED_MINE_CELL = MINE_CELL + COVER_FOR_CELL;
+    private static final int MARKED_MINE_CELL = COVERED_MINE_CELL + MARK_FOR_CELL;
+
+    private static final int DRAW_MINE = 9;
+    private static final int DRAW_COVER = 10;
+    private static final int DRAW_MARK = 11;
+    private static final int DRAW_WRONG_MARK = 12;
 
     private int[] field;
     private boolean inGame;
-    private int mines_left;
-    private Image[] img;
+    private int minesLeft;
+    private transient Image[] images;
     private int mines = 40;
     private int rows = 16;
     private int cols = 16;
-    private int all_cells;
-    private JLabel statusbar;
-
+    private int totalCells;
+    private JLabel statusBar;
 
     public Board(JLabel statusbar) {
 
